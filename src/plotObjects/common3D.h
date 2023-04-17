@@ -11,10 +11,12 @@ namespace plotObjects {
     class common3D {
     public:
         virtual std::pair<Vector3, Vector3> getPlotExtents() = 0;
+        virtual void plot() = 0;
 
     };
 
 
+    /// Non class methods (operate on instances / containers of common3D derived classes).
     std::pair<Vector3, Vector3> getMostExtremeExtents(std::vector<common3D *> &v);
 
 } // plotObjects

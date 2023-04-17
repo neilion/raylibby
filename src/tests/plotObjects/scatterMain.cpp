@@ -31,8 +31,8 @@ int main()
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 1920;
+    const int screenHeight = 1080;
 
     InitWindow(screenWidth, screenHeight, "Scatter3d example");
 
@@ -71,7 +71,7 @@ int main()
     plotObjects::scatterBackend s{};
     s.setData(data);
     s.setColor(colors);
-    s.setMarkerSize(0.02f);
+    s.setMarkerSize(0.3f);
 
     plotObjects::scatterBackend t;
     t.setMarkerSize(0.1f);
@@ -82,21 +82,16 @@ int main()
 
     auto [minCorner, maxCorner] = plotObjects::getMostExtremeExtents(plotElements3D);
 
-
-
-
-
-
-
     // Camera set up
     Camera camera = {0};
     camera.position = (Vector3){ 0.0f, 0.0f, 10.0f };
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    camera.projection = CAMERA_ORTHOGRAPHIC;
 
     CameraMode cameraMode = CAMERA_THIRD_PERSON;
+
 
     SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -124,11 +119,12 @@ int main()
 
                 UpdateCamera(&camera, cameraMode);
 
-                // Actual scatter plot.
+                // Get the current elapsed time.
                 auto t1 = std::chrono::high_resolution_clock::now();
                 auto dt = t1 - t0;
                 auto dt_sec = duration_cast<std::chrono::seconds>(dt);
                 if (dt_sec.count() > waitTime) {
+                    // Register a new point on a helix if the wait time has elapsed.
                     auto angle = static_cast<float>(waitTime) * 0.2;
                     auto x = angle * cosf(angle);
                     auto y = angle * sinf(angle);
@@ -137,17 +133,17 @@ int main()
                     waitTime = waitTime + waitInc;
                 }
 
-                s.plot();
-
+                // Pulse the center scatter marker
                 t.setMarkerSize(1.0f * sinf(0.001f * static_cast<float>(clock())));
-                t.plot();
 
+                // Loop through the elements and call .plot()
+                for (auto &element : plotElements3D) {
+                    element->plot();
+                }
+
+                // Use std::tie to reuse the variables from the previous structured binding.
                 std::tie(minCorner, maxCorner) = plotObjects::getMostExtremeExtents(plotElements3D);
 
-                printf("min xyz:  %f  %f  %f            max xyz:  %f   %f   %f  \n", minCorner.x, minCorner.y,
-                       minCorner.z, maxCorner.x, maxCorner.y, maxCorner.z);
-
-        DrawGrid(10, 1.0f);        // Draw a grid
 
             EndMode3D();
 

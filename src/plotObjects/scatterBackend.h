@@ -37,7 +37,7 @@ public:
 
 
     // Will likely want this to take in some sort of figure or axis handles. Not sure.
-    void plot(void);
+    void plot() override;
 
 
 private:
