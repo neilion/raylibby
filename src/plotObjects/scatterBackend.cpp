@@ -118,4 +118,10 @@ namespace plotObjects {
         return std::make_pair(min - markerSize , max + markerSize);
     }
 
+    void scatterBackend::addPoint(const Vector3 &newPoint, const Color &newColor) {
+        pointData.push_back(newPoint);
+        color.push_back(newColor);
+
+    }
+
 } // plotObjects

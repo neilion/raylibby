@@ -1,5 +1,6 @@
 #include <iostream>
 #include <tuple>
+#include <chrono>
 #include "raylib.h"
 #include "rcamera.h"
 #include "../../plotObjects/scatterBackend.h"
@@ -70,7 +71,7 @@ int main()
     plotObjects::scatterBackend s{};
     s.setData(data);
     s.setColor(colors);
-    s.setMarkerSize(0.2f);
+    s.setMarkerSize(0.02f);
 
     plotObjects::scatterBackend t;
     t.setMarkerSize(0.1f);
@@ -101,6 +102,11 @@ int main()
     //--------------------------------------------------------------------------------------
 
 
+    // Log start time
+    auto t0 = std::chrono::high_resolution_clock::now();
+    float waitTime = 1.0;
+    float waitInc = 10.0f;
+
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
@@ -119,9 +125,21 @@ int main()
                 UpdateCamera(&camera, cameraMode);
 
                 // Actual scatter plot.
+                auto t1 = std::chrono::high_resolution_clock::now();
+                auto dt = t1 - t0;
+                auto dt_sec = duration_cast<std::chrono::seconds>(dt);
+                if (dt_sec.count() > waitTime) {
+                    auto angle = static_cast<float>(waitTime) * 0.2;
+                    auto x = angle * cosf(angle);
+                    auto y = angle * sinf(angle);
+
+                    s.addPoint({x, y, 0}, BLACK);
+                    waitTime = waitTime + waitInc;
+                }
+
                 s.plot();
 
-                t.setMarkerSize(12 * sin(0.001 * static_cast<float>(clock())));
+                t.setMarkerSize(1.0f * sinf(0.001f * static_cast<float>(clock())));
                 t.plot();
 
                 std::tie(minCorner, maxCorner) = plotObjects::getMostExtremeExtents(plotElements3D);

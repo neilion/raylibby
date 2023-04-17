@@ -26,8 +26,11 @@ public:
 
     void setColorSingle(Color &c);
 
+    // Adding a single point.
+    void addPoint(const Vector3 &newPoint, const Color &newColor);
 
-    float getMarkerSize() const;
+
+    [[nodiscard]] float getMarkerSize() const;
     void setMarkerSize(float desiredMarkerSize);
 
     std::pair<Vector3, Vector3> getPlotExtents() override;
