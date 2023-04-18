@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD 23)
 # Adding this directory will allow for linking to the raylib library.
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/raylib")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/imgui")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/tests/extensions")
+
 
 # After raylib inclusion, add dependent objects.
 file(GLOB SRC_PLOTS
