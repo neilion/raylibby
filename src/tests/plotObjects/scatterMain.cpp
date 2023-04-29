@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include "rcamera.h"
 #include "../../plotObjects/scatterBackend.h"
+#include "../../plotObjects/gridLines3D.h"
+
 #include "extensionsVector3.h"
 
 #define numPoints   8
@@ -81,6 +83,11 @@ int main()
     plotElements3D.push_back(&t);
 
     auto [minCorner, maxCorner] = plotObjects::getMostExtremeExtents(plotElements3D);
+    plotObjects::gridLines3D g{};
+    g.setExtents(minCorner, maxCorner);
+    int numGridLines = 5;
+    g.setNumLines(numGridLines);
+
 
     // Camera set up
     Camera camera = {0};
@@ -129,20 +136,26 @@ int main()
                     auto x = angle * cosf(angle);
                     auto y = angle * sinf(angle);
 
-                    s.addPoint({x, y, 0}, BLACK);
+                    s.addPoint({static_cast<float>(x), static_cast<float>(y), 0}, BLACK);
                     waitTime = waitTime + waitInc;
+                    g.setNumLines(++numGridLines);
                 }
 
                 // Pulse the center scatter marker
                 t.setMarkerSize(1.0f * sinf(0.001f * static_cast<float>(clock())));
 
+                // Use std::tie to reuse the variables from the previous structured binding.
+                std::tie(minCorner, maxCorner) = plotObjects::getMostExtremeExtents(plotElements3D);
+                g.setExtents(minCorner, maxCorner);
+                g.computeActiveGridPlanes(camera.position, camera.position - camera.target);
+                g.setNumLines(numGridLines);
+
+
                 // Loop through the elements and call .plot()
                 for (auto &element : plotElements3D) {
                     element->plot();
                 }
-
-                // Use std::tie to reuse the variables from the previous structured binding.
-                std::tie(minCorner, maxCorner) = plotObjects::getMostExtremeExtents(plotElements3D);
+                g.plot();
 
 
             EndMode3D();
